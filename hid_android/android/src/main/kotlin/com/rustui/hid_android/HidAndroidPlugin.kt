@@ -69,7 +69,9 @@ class HidAndroidPlugin : FlutterPlugin, MethodCallHandler {
             "open" -> {
                 device = usbManager.deviceList[call.argument("deviceName")]!!
                 connection = usbManager.openDevice(device)
-                (interfaceIndex, endpointIndex) = getReadIndices(device!!)!!
+                var pair = getReadIndices(device!!)!!
+                interfaceIndex = pair.interfaceIndex
+                endpointIndex = pair.endpointIndex
                 result.success(
                     connection!!.claimInterface(
                         device!!.getInterface(interfaceIndex!!),
@@ -85,7 +87,7 @@ class HidAndroidPlugin : FlutterPlugin, MethodCallHandler {
                         kotlin.run {
                             val array = ByteArray(length)
                             connection!!.bulkTransfer(
-                                device!!.getInterface(i).getEndpoint(j),
+                                device!!.getInterface(interfaceIndex).getEndpoint(endpointIndex),
                                 array,
                                 length,
                                 duration
